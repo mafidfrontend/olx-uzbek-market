@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Search, Filter, MapPin, Star, Heart, ShoppingCart } from 'lucide-react';
+import { Search, Filter, MapPin, Star, Heart, ShoppingCart, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ImageCarousel from '../components/ImageCarousel';
@@ -10,55 +10,78 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useSearch } from '../contexts/SearchContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const mockOffers = [
   {
     id: 1,
     title: 'iPhone 14 Pro',
     price: '12,500,000 UZS',
+    priceNumber: 12500000,
     location: 'Tashkent',
     rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=300&h=200&fit=crop'
+    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=300&h=200&fit=crop',
+    category: 'electronics'
   },
   {
     id: 2,
     title: 'MacBook Air M2',
     price: '18,000,000 UZS',
+    priceNumber: 18000000,
     location: 'Samarkand',
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop'
+    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop',
+    category: 'electronics'
   },
   {
     id: 3,
     title: 'Samsung Galaxy S23',
     price: '9,800,000 UZS',
+    priceNumber: 9800000,
     location: 'Bukhara',
     rating: 4.7,
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=300&h=200&fit=crop'
+    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=300&h=200&fit=crop',
+    category: 'electronics'
   },
   {
     id: 4,
     title: 'iPad Pro 11-inch',
     price: '15,200,000 UZS',
+    priceNumber: 15200000,
     location: 'Tashkent',
     rating: 4.6,
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=200&fit=crop'
+    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=200&fit=crop',
+    category: 'electronics'
   },
   {
     id: 5,
     title: 'Sony WH-1000XM4',
     price: '2,800,000 UZS',
+    priceNumber: 2800000,
     location: 'Andijan',
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop'
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop',
+    category: 'electronics'
   },
   {
     id: 6,
     title: 'Dell XPS 13',
     price: '16,500,000 UZS',
+    priceNumber: 16500000,
     location: 'Namangan',
     rating: 4.5,
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop'
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop',
+    category: 'electronics'
   }
 ];
 
@@ -69,17 +92,63 @@ const Home = () => {
   const { searchQuery, setSearchQuery } = useSearch();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
+  
+  // Filter states
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 20000000]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [minRating, setMinRating] = useState(0);
+
+  const locations = ['Tashkent', 'Samarkand', 'Bukhara', 'Andijan', 'Namangan'];
+
+  const applyFilters = () => {
+    let filtered = mockOffers;
+
+    // Apply search query filter
+    if (searchQuery.trim() !== '') {
+      filtered = filtered.filter(offer =>
+        offer.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        offer.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply price range filter
+    filtered = filtered.filter(offer => 
+      offer.priceNumber >= priceRange[0] && offer.priceNumber <= priceRange[1]
+    );
+
+    // Apply location filter
+    if (selectedLocations.length > 0) {
+      filtered = filtered.filter(offer => 
+        selectedLocations.includes(offer.location)
+      );
+    }
+
+    // Apply rating filter
+    filtered = filtered.filter(offer => offer.rating >= minRating);
+
+    setFilteredOffers(filtered);
+    setIsFilterOpen(false);
+  };
+
+  const clearFilters = () => {
+    setPriceRange([0, 20000000]);
+    setSelectedLocations([]);
+    setMinRating(0);
+    setFilteredOffers(mockOffers);
+  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (query.trim() === '') {
-      setFilteredOffers(mockOffers);
+    // Apply filters whenever search changes
+    setTimeout(() => applyFilters(), 0);
+  };
+
+  const handleLocationChange = (location: string, checked: boolean) => {
+    if (checked) {
+      setSelectedLocations([...selectedLocations, location]);
     } else {
-      const filtered = mockOffers.filter(offer =>
-        offer.title.toLowerCase().includes(query.toLowerCase()) ||
-        offer.location.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredOffers(filtered);
+      setSelectedLocations(selectedLocations.filter(loc => loc !== location));
     }
   };
 
@@ -101,19 +170,15 @@ const Home = () => {
   };
 
   const handleViewAllOffers = () => {
-    // For now, we'll just log this. In a full app, this might navigate to a dedicated offers page
     console.log('View all offers clicked');
   };
 
   const handleViewAllSuggestions = () => {
-    // For now, we'll just log this. In a full app, this might navigate to categories page
     navigate('/categories');
   };
 
   const handleCategoryClick = (categoryName: string) => {
-    // Filter offers by category and navigate or show results
     console.log('Category clicked:', categoryName);
-    // For now, we'll just set a search query for the category
     setSearchQuery(categoryName.toLowerCase());
     handleSearch(categoryName.toLowerCase());
   };
@@ -138,9 +203,90 @@ const Home = () => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
-            <Button variant="outline" size="icon" className="border-border hover:bg-accent">
-              <Filter size={20} />
-            </Button>
+            <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="border-border hover:bg-accent">
+                  <Filter size={20} />
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Filter Options</SheetTitle>
+                  <SheetDescription>
+                    Adjust the filters to find exactly what you're looking for.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="py-6 space-y-6">
+                  {/* Price Range */}
+                  <div>
+                    <Label className="text-base font-medium">Price Range (UZS)</Label>
+                    <div className="mt-3">
+                      <Slider
+                        value={priceRange}
+                        onValueChange={setPriceRange}
+                        max={20000000}
+                        min={0}
+                        step={100000}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                        <span>{priceRange[0].toLocaleString()}</span>
+                        <span>{priceRange[1].toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location Filter */}
+                  <div>
+                    <Label className="text-base font-medium">Locations</Label>
+                    <div className="mt-3 space-y-2">
+                      {locations.map((location) => (
+                        <div key={location} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={location}
+                            checked={selectedLocations.includes(location)}
+                            onCheckedChange={(checked) => 
+                              handleLocationChange(location, checked as boolean)
+                            }
+                          />
+                          <Label htmlFor={location}>{location}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Rating Filter */}
+                  <div>
+                    <Label className="text-base font-medium">Minimum Rating</Label>
+                    <div className="mt-3">
+                      <Slider
+                        value={[minRating]}
+                        onValueChange={(value) => setMinRating(value[0])}
+                        max={5}
+                        min={0}
+                        step={0.1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                        <span>0</span>
+                        <span>{minRating}</span>
+                        <span>5</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Filter Actions */}
+                  <div className="flex space-x-3 pt-4">
+                    <Button onClick={applyFilters} className="flex-1">
+                      Apply Filters
+                    </Button>
+                    <Button onClick={clearFilters} variant="outline" className="flex-1">
+                      Clear All
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </motion.div>
 
@@ -248,7 +394,7 @@ const Home = () => {
             ))}
           </div>
 
-          {filteredOffers.length === 0 && searchQuery && (
+          {filteredOffers.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -257,7 +403,7 @@ const Home = () => {
             >
               <Search className="mx-auto mb-4 text-muted-foreground" size={64} />
               <h3 className="text-xl font-semibold text-foreground mb-2">No results found</h3>
-              <p className="text-muted-foreground">Try adjusting your search terms</p>
+              <p className="text-muted-foreground">Try adjusting your search terms or filters</p>
             </motion.div>
           )}
         </motion.section>
