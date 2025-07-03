@@ -11,37 +11,31 @@ const Categories = () => {
     {
       type: t('products'),
       icon: '📦',
-      color: 'bg-blue-50 border-blue-200',
-      items: ['Electronics', 'Fashion', 'Books', 'Sports', 'Beauty']
+      color: 'bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800',
+      items: [t('electronics'), t('fashion'), t('books'), t('sports'), t('beauty')]
     },
     {
       type: t('services'),
       icon: '🛠️',
-      color: 'bg-green-50 border-green-200',
-      items: ['Repair', 'Cleaning', 'Tutoring', 'Photography', 'Delivery']
+      color: 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800',
+      items: [t('repair'), t('cleaning'), t('tutoring'), t('photography'), t('delivery')]
     },
     {
       type: t('stores'),
       icon: '🏪',
-      color: 'bg-purple-50 border-purple-200',
-      items: ['Grocery', 'Pharmacy', 'Clothing', 'Furniture', 'Jewelry']
+      color: 'bg-purple-50 border-purple-200 dark:bg-purple-950/20 dark:border-purple-800',
+      items: [t('grocery'), t('pharmacy'), t('clothing'), t('furniture'), t('jewelry')]
     },
     {
       type: t('serviceCenters'),
       icon: '🔧',
-      color: 'bg-orange-50 border-orange-200',
-      items: ['Auto Service', 'Phone Repair', 'Appliance Fix', 'IT Support', 'Plumbing']
+      color: 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-800',
+      items: [t('autoService'), t('phoneRepair'), t('applianceFix'), t('itSupport'), t('plumbing')]
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-8">
-      <div className="bg-white shadow-sm px-4 py-4 sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900">{t('categories')}</h1>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {categoryData.map((category, index) => (
@@ -50,13 +44,13 @@ const Categories = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -8, scale: 1.02 }}
             >
-              <Card className={`${category.color} hover:shadow-lg transition-all duration-300 cursor-pointer`}>
+              <Card className={`${category.color} hover:shadow-xl transition-all duration-300 cursor-pointer border-2`}>
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
-                    <span className="text-3xl mr-3">{category.icon}</span>
-                    <h2 className="text-xl font-bold text-gray-900">{category.type}</h2>
+                    <span className="text-4xl mr-4">{category.icon}</span>
+                    <h2 className="text-xl font-bold text-foreground">{category.type}</h2>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {category.items.map((item, itemIndex) => (
@@ -70,7 +64,7 @@ const Categories = () => {
                       >
                         <Badge 
                           variant="secondary" 
-                          className="bg-white/80 hover:bg-white cursor-pointer transition-all duration-200"
+                          className="bg-background/80 hover:bg-background cursor-pointer transition-all duration-200 border border-border"
                         >
                           {item}
                         </Badge>
@@ -90,23 +84,31 @@ const Categories = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-8"
         >
-          <Card className="bg-gradient-to-r from-[#1877F2] to-blue-600 text-white">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-bold mb-4">🌟 Personal Listings</h2>
-              <p className="text-white/90 mb-4">
-                Create your own listings for personal items, services, or business offerings.
+          <Card className="bg-gradient-to-r from-[#1877F2] to-blue-600 text-white shadow-xl">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold mb-4 flex items-center">
+                🌟 {t('personalListings')}
+              </h2>
+              <p className="text-white/90 mb-6 text-lg">
+                {t('personalListingsDesc')}
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {['Cars', 'Real Estate', 'Jobs', 'Events'].map((item, index) => (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { name: t('cars'), icon: '🚗' },
+                  { name: t('realEstate'), icon: '🏠' },
+                  { name: t('jobs'), icon: '💼' },
+                  { name: t('events'), icon: '🎉' }
+                ].map((item, index) => (
                   <motion.div
-                    key={item}
+                    key={item.name}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: 0.5 + (index * 0.1) }}
                     whileHover={{ scale: 1.05 }}
-                    className="bg-white/20 rounded-lg p-3 text-center cursor-pointer hover:bg-white/30 transition-all duration-200"
+                    className="bg-white/20 backdrop-blur rounded-xl p-4 text-center cursor-pointer hover:bg-white/30 transition-all duration-200"
                   >
-                    <p className="font-medium">{item}</p>
+                    <div className="text-2xl mb-2">{item.icon}</div>
+                    <p className="font-medium">{item.name}</p>
                   </motion.div>
                 ))}
               </div>

@@ -1,6 +1,7 @@
 
 import { ReactNode } from 'react';
 import BottomNavigation from './BottomNavigation';
+import { TopNavigation } from './TopNavigation';
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,8 +9,11 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {children}
+    <div className="min-h-screen bg-background">
+      <TopNavigation />
+      <main className="pb-20 md:pb-8">
+        {children}
+      </main>
       <BottomNavigation />
     </div>
   );

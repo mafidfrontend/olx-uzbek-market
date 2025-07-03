@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import './i18n';
 import Layout from './components/Layout';
+import { ThemeProvider } from './components/ThemeProvider';
 import SplashScreen from './components/SplashScreen';
 import Home from './pages/Home';
 import Categories from './pages/Categories';
@@ -30,22 +31,24 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/add-ad" element={<AddAd />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="system" storageKey="ecommerce-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/add-ad" element={<AddAd />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

@@ -38,31 +38,34 @@ const Home = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-8">
-      {/* Header */}
-      <div className="bg-white shadow-sm px-4 py-4 sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Search Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6"
+        >
           <div className="flex items-center space-x-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
                 placeholder={t('searchPlaceholder')}
-                className="pl-10 border-gray-200 focus:border-[#1877F2] focus:ring-[#1877F2]/20"
+                className="pl-10 border-border bg-background focus:border-[#1877F2] focus:ring-[#1877F2]/20"
               />
             </div>
-            <Button variant="outline" size="icon" className="border-gray-200">
+            <Button variant="outline" size="icon" className="border-border hover:bg-accent">
               <Filter size={20} />
             </Button>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Banner Carousel */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-8"
         >
           <ImageCarousel />
@@ -72,57 +75,59 @@ const Home = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-gradient-to-r from-[#1877F2] to-blue-600 rounded-lg p-4 mb-6 text-white"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-gradient-to-r from-[#1877F2] to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg"
         >
-          <h3 className="font-semibold mb-2">🔔 Latest Updates</h3>
-          <p className="text-sm opacity-90">New premium listings available in your area!</p>
+          <h3 className="font-semibold mb-2 flex items-center">
+            🔔 {t('latestUpdates')}
+          </h3>
+          <p className="text-sm opacity-90">{t('newPremiumListings')}</p>
         </motion.div>
 
         {/* Nearby Offers */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <MapPin className="mr-2 text-[#1877F2]" size={20} />
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground flex items-center">
+              <MapPin className="mr-2 text-[#1877F2]" size={24} />
               {t('nearbyOffers')}
             </h2>
-            <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80">
+            <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
               {t('viewAll')}
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mockOffers.map((offer, index) => (
               <motion.div
                 key={offer.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
+                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                whileHover={{ y: -8, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
+                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-border bg-card">
                   <div className="aspect-video relative overflow-hidden">
                     <img
                       src={offer.image}
                       alt={offer.title}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                     />
-                    <div className="absolute top-2 right-2 bg-white/90 rounded-full px-2 py-1 flex items-center">
-                      <Star className="text-yellow-400 fill-current mr-1" size={12} />
-                      <span className="text-xs font-medium">{offer.rating}</span>
+                    <div className="absolute top-3 right-3 bg-background/95 backdrop-blur rounded-full px-3 py-1.5 flex items-center shadow-lg">
+                      <Star className="text-yellow-500 fill-current mr-1" size={14} />
+                      <span className="text-sm font-medium text-foreground">{offer.rating}</span>
                     </div>
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">{offer.title}</h3>
-                    <p className="text-[#1877F2] font-bold text-lg mb-1">{offer.price}</p>
-                    <p className="text-gray-500 text-sm flex items-center">
-                      <MapPin size={12} className="mr-1" />
+                  <CardContent className="p-5">
+                    <h3 className="font-semibold text-foreground mb-2 text-lg">{offer.title}</h3>
+                    <p className="text-[#1877F2] font-bold text-xl mb-2">{offer.price}</p>
+                    <p className="text-muted-foreground text-sm flex items-center">
+                      <MapPin size={14} className="mr-1" />
                       {offer.location}
                     </p>
                   </CardContent>
@@ -136,30 +141,35 @@ const Home = () => {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">{t('suggestions')}</h2>
-            <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground">{t('suggestions')}</h2>
+            <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
               {t('viewAll')}
             </Button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['Electronics', 'Fashion', 'Home & Garden', 'Automotive'].map((category, index) => (
+            {[
+              { name: t('electronics'), icon: '📱' },
+              { name: t('fashion'), icon: '👗' },
+              { name: 'Home & Garden', icon: '🏡' },
+              { name: 'Automotive', icon: '🚗' }
+            ].map((category, index) => (
               <motion.div
-                key={category}
+                key={category.name}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                whileHover={{ scale: 1.05, y: -4 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md transition-all duration-300"
+                className="bg-card border border-border rounded-xl p-6 text-center cursor-pointer hover:shadow-lg transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-[#1877F2]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-2xl">📱</span>
+                <div className="w-16 h-16 bg-[#1877F2]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">{category.icon}</span>
                 </div>
-                <p className="font-medium text-gray-900">{category}</p>
+                <p className="font-medium text-foreground">{category.name}</p>
               </motion.div>
             ))}
           </div>
