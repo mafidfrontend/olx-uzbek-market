@@ -1,11 +1,14 @@
-
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Search, Filter, MapPin, Star } from 'lucide-react';
+import { Search, Filter, MapPin, Star, Heart, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
 import ImageCarousel from '../components/ImageCarousel';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useSearch } from '../contexts/SearchContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import { useCart } from '../contexts/CartContext';
 
 const mockOffers = [
   {
@@ -31,11 +34,65 @@ const mockOffers = [
     location: 'Bukhara',
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=300&h=200&fit=crop'
+  },
+  {
+    id: 4,
+    title: 'iPad Pro 11-inch',
+    price: '15,200,000 UZS',
+    location: 'Tashkent',
+    rating: 4.6,
+    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=200&fit=crop'
+  },
+  {
+    id: 5,
+    title: 'Sony WH-1000XM4',
+    price: '2,800,000 UZS',
+    location: 'Andijan',
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop'
+  },
+  {
+    id: 6,
+    title: 'Dell XPS 13',
+    price: '16,500,000 UZS',
+    location: 'Namangan',
+    rating: 4.5,
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop'
   }
 ];
 
 const Home = () => {
   const { t } = useTranslation();
+  const [filteredOffers, setFilteredOffers] = useState(mockOffers);
+  const { searchQuery, setSearchQuery } = useSearch();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredOffers(mockOffers);
+    } else {
+      const filtered = mockOffers.filter(offer =>
+        offer.title.toLowerCase().includes(query.toLowerCase()) ||
+        offer.location.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredOffers(filtered);
+    }
+  };
+
+  const handleWishlistToggle = (offer: any) => {
+    if (isInWishlist(offer.id)) {
+      removeFromWishlist(offer.id);
+    } else {
+      addToWishlist(offer);
+    }
+  };
+
+  const handleAddToCart = (offer: any) => {
+    addToCart(offer);
+    console.log('Added to cart:', offer.title);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,6 +110,8 @@ const Home = () => {
               <Input
                 placeholder={t('searchPlaceholder')}
                 className="pl-10 border-border bg-background focus:border-[#1877F2] focus:ring-[#1877F2]/20"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
             <Button variant="outline" size="icon" className="border-border hover:bg-accent">
@@ -84,7 +143,7 @@ const Home = () => {
           <p className="text-sm opacity-90">{t('newPremiumListings')}</p>
         </motion.div>
 
-        {/* Nearby Offers */}
+        {/* Search Results or Nearby Offers */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,7 +153,7 @@ const Home = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground flex items-center">
               <MapPin className="mr-2 text-[#1877F2]" size={24} />
-              {t('nearbyOffers')}
+              {searchQuery ? `Search Results (${filteredOffers.length})` : t('nearbyOffers')}
             </h2>
             <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
               {t('viewAll')}
@@ -102,7 +161,7 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockOffers.map((offer, index) => (
+            {filteredOffers.map((offer, index) => (
               <motion.div
                 key={offer.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -122,58 +181,96 @@ const Home = () => {
                       <Star className="text-yellow-500 fill-current mr-1" size={14} />
                       <span className="text-sm font-medium text-foreground">{offer.rating}</span>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-3 left-3 bg-background/95 backdrop-blur rounded-full hover:bg-red-500 hover:text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleWishlistToggle(offer);
+                      }}
+                    >
+                      <Heart 
+                        size={16} 
+                        className={isInWishlist(offer.id) ? 'fill-current text-red-500' : ''} 
+                      />
+                    </Button>
                   </div>
                   <CardContent className="p-5">
                     <h3 className="font-semibold text-foreground mb-2 text-lg">{offer.title}</h3>
                     <p className="text-[#1877F2] font-bold text-xl mb-2">{offer.price}</p>
-                    <p className="text-muted-foreground text-sm flex items-center">
+                    <p className="text-muted-foreground text-sm flex items-center mb-4">
                       <MapPin size={14} className="mr-1" />
                       {offer.location}
                     </p>
+                    <Button 
+                      className="w-full bg-[#1877F2] hover:bg-[#1877F2]/90 flex items-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(offer);
+                      }}
+                    >
+                      <ShoppingCart size={16} className="mr-2" />
+                      Add to Cart
+                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
+
+          {filteredOffers.length === 0 && searchQuery && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center py-12"
+            >
+              <Search className="mx-auto mb-4 text-muted-foreground" size={64} />
+              <h3 className="text-xl font-semibold text-foreground mb-2">No results found</h3>
+              <p className="text-muted-foreground">Try adjusting your search terms</p>
+            </motion.div>
+          )}
         </motion.section>
 
-        {/* Suggestions */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">{t('suggestions')}</h2>
-            <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
-              {t('viewAll')}
-            </Button>
-          </div>
+        {!searchQuery && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground">{t('suggestions')}</h2>
+              <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
+                {t('viewAll')}
+              </Button>
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { name: t('electronics'), icon: '📱' },
-              { name: t('fashion'), icon: '👗' },
-              { name: 'Home & Garden', icon: '🏡' },
-              { name: 'Automotive', icon: '🚗' }
-            ].map((category, index) => (
-              <motion.div
-                key={category.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -4 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-card border border-border rounded-xl p-6 text-center cursor-pointer hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-16 h-16 bg-[#1877F2]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">{category.icon}</span>
-                </div>
-                <p className="font-medium text-foreground">{category.name}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { name: t('electronics'), icon: '📱' },
+                { name: t('fashion'), icon: '👗' },
+                { name: 'Home & Garden', icon: '🏡' },
+                { name: 'Automotive', icon: '🚗' }
+              ].map((category, index) => (
+                <motion.div
+                  key={category.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -4 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-card border border-border rounded-xl p-6 text-center cursor-pointer hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="w-16 h-16 bg-[#1877F2]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-3xl">{category.icon}</span>
+                  </div>
+                  <p className="font-medium text-foreground">{category.name}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+        )}
       </div>
     </div>
   );
