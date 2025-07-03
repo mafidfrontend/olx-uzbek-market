@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Search, Filter, MapPin, Star, Heart, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ImageCarousel from '../components/ImageCarousel';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -63,6 +64,7 @@ const mockOffers = [
 
 const Home = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [filteredOffers, setFilteredOffers] = useState(mockOffers);
   const { searchQuery, setSearchQuery } = useSearch();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -92,6 +94,28 @@ const Home = () => {
   const handleAddToCart = (offer: any) => {
     addToCart(offer);
     console.log('Added to cart:', offer.title);
+  };
+
+  const handleProductClick = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
+
+  const handleViewAllOffers = () => {
+    // For now, we'll just log this. In a full app, this might navigate to a dedicated offers page
+    console.log('View all offers clicked');
+  };
+
+  const handleViewAllSuggestions = () => {
+    // For now, we'll just log this. In a full app, this might navigate to categories page
+    navigate('/categories');
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    // Filter offers by category and navigate or show results
+    console.log('Category clicked:', categoryName);
+    // For now, we'll just set a search query for the category
+    setSearchQuery(categoryName.toLowerCase());
+    handleSearch(categoryName.toLowerCase());
   };
 
   return (
@@ -155,7 +179,11 @@ const Home = () => {
               <MapPin className="mr-2 text-[#1877F2]" size={24} />
               {searchQuery ? `Search Results (${filteredOffers.length})` : t('nearbyOffers')}
             </h2>
-            <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
+            <Button 
+              variant="ghost" 
+              className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10"
+              onClick={handleViewAllOffers}
+            >
               {t('viewAll')}
             </Button>
           </div>
@@ -169,6 +197,7 @@ const Home = () => {
                 transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => handleProductClick(offer.id)}
               >
                 <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-border bg-card">
                   <div className="aspect-video relative overflow-hidden">
@@ -241,7 +270,11 @@ const Home = () => {
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-foreground">{t('suggestions')}</h2>
-              <Button variant="ghost" className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10">
+              <Button 
+                variant="ghost" 
+                className="text-[#1877F2] hover:text-[#1877F2]/80 hover:bg-[#1877F2]/10"
+                onClick={handleViewAllSuggestions}
+              >
                 {t('viewAll')}
               </Button>
             </div>
@@ -261,6 +294,7 @@ const Home = () => {
                   whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-card border border-border rounded-xl p-6 text-center cursor-pointer hover:shadow-lg transition-all duration-300"
+                  onClick={() => handleCategoryClick(category.name)}
                 >
                   <div className="w-16 h-16 bg-[#1877F2]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">{category.icon}</span>
