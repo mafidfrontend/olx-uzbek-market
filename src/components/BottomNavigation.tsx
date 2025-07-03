@@ -1,5 +1,4 @@
-
-import { House, Grid2x2, Megaphone, Receipt, Avatar } from 'lucide-react';
+import { House, Grid2x2, Megaphone, Receipt, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -14,7 +13,7 @@ const BottomNavigation = () => {
     { key: 'categories', path: '/categories', icon: Grid2x2, label: t('categories') },
     { key: 'add', path: '/add-ad', icon: Megaphone, label: t('addAd') },
     { key: 'bookings', path: '/bookings', icon: Receipt, label: t('bookings') },
-    { key: 'profile', path: '/profile', icon: Avatar, label: t('profile') },
+    { key: 'profile', path: '/profile', icon: User, label: t('profile') },
   ];
 
   return (
